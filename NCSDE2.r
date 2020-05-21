@@ -247,7 +247,7 @@ iterate2=function(lambda=0, eps=0.01, n.iter=250, update.lam=TRUE, combine.lam=F
 
 
 #######################           Iterations for a given tuning parameter          #############
-iter=function(lambda=0, eps=0.01, n.iter=250, update.lam=FALSE) {
+iter = function(lambda=0, eps=0.01, n.iter=250, update.lam=FALSE) {
 	Theta <- list(); A <- list(); #if (is.double(lambda)) lambda <- rep(lambda, ncol(init$Theta)); 
 	diff <- eps + nrow(init$A); l <- 1; Theta[[l]] <- init$Theta; A[[l]] <- init$A; Lambda <- lambda;
 	while (abs(diff) > eps && l < n.iter) {
@@ -339,85 +339,84 @@ getmode <- function(v) {
    uniqv[which.max(tabulate(match(v, uniqv)))]
 }
 
-soilmean=function(x){
-  a=x[,,1]
+soilmean = function(x){
+  a = x[,,1]
   for (i in 2:24){
-    a=a+x[,,i]
+    a = a + x[, , i]
   }
-  a=a/24
+  a = a/24
   return(a)
 }
 
 
-bs=function(Xs,f,n,d,s){
+bs = function(Xs,f,n,d,s){
   freq <- get_Fourier_freqs(nrow(Xs),ncol(Xs))/2/pi
-  freq=freq[1:f,]
+  freq = freq[1:f,]
   B1 <- fda::bsplineS(freq[,1],breaks=seq(min(freq[,1]),max(freq[,1]),length.out=n),norder=d);
   B2 <- fda::bsplineS(freq[,2],breaks=seq(min(freq[,2]),max(freq[,2]),length.out=n),norder=d);
   B <- mgcv::tensor.prod.model.matrix(X=list(B1,B2))
   L1 <- diff(diag(n+d-2),differences=2)
   L2 <- diff(diag(n+d-2),differences=2)
   PP <- D.tensor(L1,L2)
-  return(B%*%solve(t(B)%*%B+s*PP   )%*%t(B))
+  return(B%*%solve(t(B)%*%B+s*PP)%*%t(B))
 }
 
-spa_ind=function(x,u,v){
-  row=floor((x-1)/u)+1
-  if (x%%u==0) col=u
-  if (x%%u!=0) col=x%%u
-  return(c(row,col))
+spa_ind = function(x, u, v){
+  row = floor((x-1)/u)+1
+  if (x %% u == 0) col=u
+  if (x %% u != 0) col = x %% u
+  return(c(row, col))
 }
 
-spa_inv=function(x,y,u,v){
-  return((x-1)*u+y)
+spa_inv = function(x,y,u,v){
+  return((x - 1) * u + y)
 }
   
-spa_rough=function(A,dima){
-  K=ncol(A)
-  asmo=rep(0,K)
+spa_rough = function(A,dima){
+  K = ncol(A)
+  asmo = rep(0,K)
   for(p in 1:K){
     for(i in 1:dima[1]*dima[2]){
       row= spa_ind(i,dima[1],dima[2])[1]
       col= spa_ind(i,dima[1],dima[2])[2]
       if( row>1 & row<dima[2] & col>1 & col< dima[1] )
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/4*(A[spa_inv(row+1,col,dima[1],dima[2]),p]+A[spa_inv(row-1,col,dima[1],dima[2]),p]+
-                                  +A[spa_inv(row,col+1,dima[1],dima[2]),p] +A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
+       +1/4*(A[spa_inv(row+1,col,dima[1],dima[2]),p]+A[spa_inv(row-1,col,dima[1],dima[2]),p]+
+       +A[spa_inv(row,col+1,dima[1],dima[2]),p] +A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
       if(row==1  & col==1) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/2*(A[spa_inv(row+1,col,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}
+      +1/2*(A[spa_inv(row+1,col,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}
       if(row==1  & col==dima[1]) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/2*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]))^2}
+      +1/2*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]))^2}
       if(row==dima[2]  & col==1) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/2*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}
+      +1/2*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}
       if(row==dima[2]  & col==dima[1]) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/2*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
+      +1/2*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
       if(row==1 & col>1 & col< dima[1])
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/3*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]
-                                + +A[spa_inv(row+1,col,dima[1],dima[2]),p]))^2}
+      +1/3*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]
+      + +A[spa_inv(row+1,col,dima[1],dima[2]),p]))^2}
       if(row>1 & row<dima[2] & col== dima[1])
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/3*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]
-                                + +A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
+      +1/3*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]
+      + +A[spa_inv(row,col-1,dima[1],dima[2]),p]))^2}
       if(row==dima[2] & col>1 & col< dima[1]) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/3*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]
-                                + +A[spa_inv(row-1,col,dima[1],dima[2]),p]))^2}
+       +1/3*(A[spa_inv(row,col-1,dima[1],dima[2]),p]+A[spa_inv(row,col+1,dima[1],dima[2]),p]
+      + +A[spa_inv(row-1,col,dima[1],dima[2]),p]))^2}
       if(row>1 & row<dima[2] & col==1) 
       {asmo[p]=asmo[p]+(A[spa_inv(row,col,dima[1],dima[2]),p]-
-                          +1/3*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]
-                                + +A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}
-      
+      +1/3*(A[spa_inv(row-1,col,dima[1],dima[2]),p]+A[spa_inv(row+1,col,dima[1],dima[2]),p]
+     + +A[spa_inv(row,col+1,dima[1],dima[2]),p]))^2}      
     }}
   return(asmo)
 }
 
 
-iterate13=function(lambda=0,lambda2=0, eps=0.01, n.iter=50, update.lam=TRUE, combine.lam=FALSE, which.spec=NULL, trace.graph=TRUE,dima=dima){
+iterate13= function(lambda=0,lambda2=0, eps=0.01, n.iter=50, update.lam=TRUE, combine.lam=FALSE, which.spec=NULL, trace.graph=TRUE,dima=dima){
   #dima: dimension of A
   Theta <- list(); A <- list(); l <- 1; m <- 2
   if (!is.null(which.spec)) {
@@ -499,24 +498,24 @@ iterate13=function(lambda=0,lambda2=0, eps=0.01, n.iter=50, update.lam=TRUE, com
       if(row==1 & col==2){ 
         for(p in 1:ncol(A[[l]])){
           A.chng[i,p] <- solve( t(Theta[[l]][,p])%*%temp4%*%Theta[[l]][,p]-205/72*lambda2[p])%*%(t(Theta[[l]][,p])%*%
-                                                                                                   + temp3-(205/72*A[[l]][spa_inv(1,2,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,1,dima[1],dima[2]),p]
-                                                                                                            + -4/3*A[[l]][spa_inv(1,3,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(1,4,dima[1],dima[2]),p]  
-                                                                                                            +  +10/16*A[[l]][spa_inv(2,1,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,2,dima[1],dima[2]),p]
-                                                                                                            +  +50/144*A[[l]][spa_inv(2,3,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(3,2,dima[1],dima[2]),p])*lambda2[p])}}
+	+ temp3-(205/72*A[[l]][spa_inv(1,2,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,1,dima[1],dima[2]),p]
+	+ -4/3*A[[l]][spa_inv(1,3,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(1,4,dima[1],dima[2]),p]  
+	+  +10/16*A[[l]][spa_inv(2,1,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,2,dima[1],dima[2]),p]
+	+  +50/144*A[[l]][spa_inv(2,3,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(3,2,dima[1],dima[2]),p])*lambda2[p])}}
       if(row==2 & col==1){
         for(p in 1:ncol(A[[l]])){
           A.chng[i,p] <- solve( t(Theta[[l]][,p])%*%temp4%*%Theta[[l]][,p]-205/72*lambda2[p]  )%*%(t(Theta[[l]][,p])%*%
-                                                                                                     + temp3-(205/72*A[[l]][spa_inv(2,1,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,1,dima[1],dima[2]),p]
-                                                                                                              + -4/3*A[[l]][spa_inv(3,1,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(4,1,dima[1],dima[2]),p]  
-                                                                                                              +  +10/16*A[[l]][spa_inv(1,2,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,2,dima[1],dima[2]),p]
-                                                                                                              +  +50/144*A[[l]][spa_inv(3,2,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(2,3,dima[1],dima[2]),p])*lambda2[p])}}
+	+ temp3-(205/72*A[[l]][spa_inv(2,1,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,1,dima[1],dima[2]),p]
+	+ -4/3*A[[l]][spa_inv(3,1,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(4,1,dima[1],dima[2]),p]  
+	+  +10/16*A[[l]][spa_inv(1,2,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,2,dima[1],dima[2]),p]
+	+  +50/144*A[[l]][spa_inv(3,2,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(2,3,dima[1],dima[2]),p])*lambda2[p])}}
       if(row==1 & col==dima[1]-1){
         for(p in 1:ncol(A[[l]])){  
           A.chng[i,p] <- solve( t(Theta[[l]][,p])%*%temp4%*%Theta[[l]][,p]-205/72*lambda2[p]  )%*%(t(Theta[[l]][,p])%*%
-                                                                                                     + temp3-(205/72*A[[l]][spa_inv(1,col,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,col+1,dima[1],dima[2]),p]
-                                                                                                              + -4/3*A[[l]][spa_inv(1,col-1,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(1,col-2,dima[1],dima[2]),p]  
-                                                                                                              +  +10/16*A[[l]][spa_inv(1,col+1,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,dima[1]-1,dima[1],dima[2]),p]
-                                                                                                              +  +50/144*A[[l]][spa_inv(row+1,dima[1]-2,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(3,dima[1]-1,dima[1],dima[2]),p])*lambda2[p])}}
+	+ temp3-(205/72*A[[l]][spa_inv(1,col,dima[1],dima[2]),p]-10/6*A[[l]][spa_inv(1,col+1,dima[1],dima[2]),p]
+	+ -4/3*A[[l]][spa_inv(1,col-1,dima[1],dima[2]),p]+2/9*A[[l]][spa_inv(1,col-2,dima[1],dima[2]),p]  
+	+  +10/16*A[[l]][spa_inv(1,col+1,dima[1],dima[2]),p]-14/12*A[[l]][spa_inv(2,dima[1]-1,dima[1],dima[2]),p]
+	+  +50/144*A[[l]][spa_inv(row+1,dima[1]-2,dima[1],dima[2]),p]+2/16*A[[l]][spa_inv(3,dima[1]-1,dima[1],dima[2]),p])*lambda2[p])}}
       if(row==2 & col==dima[1]) {
         for(p in 1:ncol(A[[l]])){  
           A.chng[i,p] <- solve( t(Theta[[l]][,p])%*%temp4%*%Theta[[l]][,p]-205/72*lambda2[p]  )%*%(t(Theta[[l]][,p])%*%
